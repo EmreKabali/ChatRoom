@@ -1,0 +1,110 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<style>
+    .connection {
+        
+        margin-bottom:5px;
+        padding:5px;
+
+    }
+
+    .connection:hover{
+        
+        color:yellow;
+        cursor:pointer;
+
+
+    }
+</style>
+
+<div class="panel">
+    <div class="col-xs-9">
+        <div>
+
+            <h2>Yardım</h2>
+            <div class="chat-panel panel panel-default">
+                <div class="panel-heading">
+                    Cafe Automation
+                    <i class="fa fa-paper-plane fa-fw"></i>
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body" id="chat" style="height:250px;">
+                    <input type="hidden" id="displayname" />
+
+                    <p id="discussion"></p>
+                </div>
+                <!-- /.panel-body -->
+                <div class="panel-footer">
+                    <div class="input-group">
+                        <input id="message" type="text" name="message" class="form-control input-sm" placeholder="Type your message here..." />
+
+                        <span class="input-group-btn">
+                            <input type="button" class="btn btn-warning btn-sm" id="sendmessage" value="Send">
+
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-3">
+            <div class="panel panel-group">
+                <p>ONLINE USERS</p>
+                <div id="Connections" class="jumbotron"></div>
+            </div>
+        </div>
+       
+
+    </div>
+   
+
+</div>
+
+<script>
+
+    $(function () {
+        var hub = $.connection.myHub;
+
+       
+
+        hub.client.broadcastConnections = function (allConnections) {
+            $("#Connections").html('');
+            for (var key in allConnections) {
+                
+
+                var append = "<div class='connection'><i class='fas fa-heart'></i>\
+                              <span id='connectionName'>"+ allConnections[key] +"</span>\
+                              <input type='hidden' id='connectionId' value='"+ key +"'/>\
+                              </div > "
+
+                $("#Connections").append(append);
+            }
+        };
+        hub.client.addNewMessageToPage = function (name, message) {
+           
+            
+                // Add the message to the page.
+            $('#discussion').append('<p style="color:green; text-align:left; width:500px"><strong>'
+                + ' </strong> '+name+":" + message + '</p>');
+           
+        };
+
+        hub.connection.start().done(function () {
+            //User name
+            var connectionname = prompt();
+            hub.server.setConnectionName(connectionname);
+            $('#sendmessage').click(function () {
+
+                hub.server.send(connectionname, $('#message').val());
+
+            });
+           
+
+        });
+
+      
+    });
+  
+   
+</script>
